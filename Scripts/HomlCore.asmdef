@@ -1,0 +1,17 @@
+{
+    "name": "HomlCore",
+    "references": [
+        "GUID:9f974c5dc3c182048a3746cc7211be8f"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "HtmlAgilityPack.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
