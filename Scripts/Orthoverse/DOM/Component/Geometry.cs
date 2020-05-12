@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 using Orthoverse.DOM.Entity;
 
@@ -36,25 +37,39 @@ namespace Orthoverse.DOM.Component
 
             switch(primitivename){
                 case "box":
-                    boxGen(ref mesh);
+                    boxGen(ref mesh, e.gameObject);
                     break;
                 case "sphere":
-                    sphereGen(ref mesh);
+                    sphereGen(ref mesh, e.gameObject);
                     break;
                 case "plane":
-                    planeGen(ref mesh);
+                    planeGen(ref mesh, e.gameObject);
+                    break;
+                case "cylinder":
+                    cylinderGen(ref mesh, e.gameObject);
+                    break;
+                case "cone":
+                    coneGen(ref mesh, e.gameObject);
+                    break;
+                case "torus":
+                    torusGen(ref mesh, e.gameObject);
                     break;
                 default:
                     break;
             }
 
-            mesh.RecalculateBounds();
-
             var meshFilter = e.gameObject.AddComponent<MeshFilter>();
             meshFilter.mesh = mesh;
+
+            var meshRenderer = e.gameObject.GetComponent<MeshRenderer>();
+            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            meshRenderer.receiveShadows = false;
+            meshRenderer.lightProbeUsage = LightProbeUsage.Off;
+            meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            meshRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
         }
 
-        private void boxGen(ref UnityEngine.Mesh mesh){
+        private void boxGen(ref UnityEngine.Mesh mesh, GameObject go){
             string value;
             float width = attrDic.TryGetValue("width", out value) ? float.Parse(value) : 1f;
             float height = attrDic.TryGetValue("height", out value) ? float.Parse(value) : 1f;
@@ -64,9 +79,17 @@ namespace Orthoverse.DOM.Component
             float segmentDepth = attrDic.TryGetValue("segmentdepth", out value) ? float.Parse(value) : 1f;
 
             BoxGeometry.getVertices(ref mesh, width, height, depth, Mathf.FloorToInt(segmentWidth), Mathf.FloorToInt(segmentHeight), Mathf.FloorToInt(segmentDepth));
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            bc.center = Vector3.zero;
+            bc.size = new Vector3(width,height,depth);
+            bc.isTrigger = true;
+            bc.enabled = false;
         }
 
-        private void sphereGen(ref UnityEngine.Mesh mesh){
+        private void sphereGen(ref UnityEngine.Mesh mesh, GameObject go){
             string value;
             float radius = attrDic.TryGetValue("radius", out value) ? float.Parse(value) : 1f;
             float segmentWidth = attrDic.TryGetValue("segmentwidth", out value) ? float.Parse(value) : 18f;
@@ -77,9 +100,26 @@ namespace Orthoverse.DOM.Component
             float thetaLength = attrDic.TryGetValue("thetalength", out value) ? float.Parse(value) : 360f;
 
             SphereGeometry.getVertices(ref mesh, radius, Mathf.FloorToInt(segmentWidth), Mathf.FloorToInt(segmentHeight),phiStart, phiLength,thetaStart,thetaLength);
+
+            mesh.RecalculateBounds();
+
+            if(phiStart!=0f || phiLength!=360f || thetaStart!=0f || thetaLength!=360f ){
+                var bc = go.AddComponent<BoxCollider>();
+                var bound = mesh.bounds;
+                bc.center = bound.center;
+                bc.size = bound.size;
+                bc.isTrigger = true;
+                bc.enabled = false;
+            } else {
+                var sc = go.AddComponent<SphereCollider>();
+                sc.center = Vector3.zero;
+                sc.radius = radius;
+                sc.isTrigger = true;
+                sc.enabled = false;
+            }
         }
 
-        private void planeGen(ref UnityEngine.Mesh mesh){
+        private void planeGen(ref UnityEngine.Mesh mesh, GameObject go){
             string value;
             float width = attrDic.TryGetValue("width", out value) ? float.Parse(value) : 1f;
             float height = attrDic.TryGetValue("height", out value) ? float.Parse(value) : 1f;
@@ -87,6 +127,76 @@ namespace Orthoverse.DOM.Component
             float segmentHeight = attrDic.TryGetValue("segmentheight", out value) ? float.Parse(value) : 1f;
 
             PlaneGeometry.getVertices(ref mesh, width, height, Mathf.FloorToInt(segmentWidth), Mathf.FloorToInt(segmentHeight));
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            bc.center = Vector3.zero;
+            bc.size = new Vector3(width,height,0.05f);
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void cylinderGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            float radius = attrDic.TryGetValue("radius", out value) ? float.Parse(value) : 1f;
+            float height = attrDic.TryGetValue("height", out value) ? float.Parse(value) : 2f;
+            float segmentsRadial = attrDic.TryGetValue("segmentsRadial", out value) ? float.Parse(value) : 36f;
+            float segmentsHeight = attrDic.TryGetValue("segmentsHeight", out value) ? float.Parse(value) : 18f;
+            bool openEnded = attrDic.TryGetValue("openEnded", out value) ? bool.Parse(value) : false;   
+            float thetaStart = attrDic.TryGetValue("thetaStart", out value) ? float.Parse(value) : 0f;
+            float thetaLength = attrDic.TryGetValue("thetaLength", out value) ? float.Parse(value) : 360f;
+
+            CylinderGeometry.getVertices(ref mesh, height, openEnded, radius, radius, Mathf.FloorToInt(segmentsRadial), Mathf.FloorToInt(segmentsHeight),thetaStart,thetaLength);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            bc.size = bound.size;
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void coneGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            float radiusTop = attrDic.TryGetValue("radiusTop", out value) ? float.Parse(value) : 1f;
+            float radiusBottom = attrDic.TryGetValue("radiusBottom", out value) ? float.Parse(value) : 1f;
+            float height = attrDic.TryGetValue("height", out value) ? float.Parse(value) : 2f;
+            float segmentsRadial = attrDic.TryGetValue("segmentsRadial", out value) ? float.Parse(value) : 36f;
+            float segmentsHeight = attrDic.TryGetValue("segmentsHeight", out value) ? float.Parse(value) : 18f;
+            bool openEnded = attrDic.TryGetValue("openEnded", out value) ? bool.Parse(value) : false;   
+            float thetaStart = attrDic.TryGetValue("thetaStart", out value) ? float.Parse(value) : 0f;
+            float thetaLength = attrDic.TryGetValue("thetaLength", out value) ? float.Parse(value) : 360f;
+
+            CylinderGeometry.getVertices(ref mesh, height, openEnded, radiusBottom, radiusTop, Mathf.FloorToInt(segmentsRadial), Mathf.FloorToInt(segmentsHeight),thetaStart,thetaLength);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            bc.size = bound.size;
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void torusGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            float radius = attrDic.TryGetValue("radius", out value) ? float.Parse(value) : 1f;
+            float radiusTubular = attrDic.TryGetValue("radiusTubular", out value) ? float.Parse(value) : 0.2f;
+            float segmentsRadial = attrDic.TryGetValue("segmentsRadial", out value) ? float.Parse(value) : 36f;
+            float segmentsTubular = attrDic.TryGetValue("segmentsTubular", out value) ? float.Parse(value) : 32f;
+            float arc = attrDic.TryGetValue("arc", out value) ? float.Parse(value) : 360f;
+
+            TorusGeometry.getVertices(ref mesh, radius,radiusTubular,Mathf.FloorToInt(segmentsRadial), Mathf.FloorToInt(segmentsTubular),arc);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            bc.size = bound.size;
+            bc.isTrigger = true;
+            bc.enabled = false;
         }
     }
 }

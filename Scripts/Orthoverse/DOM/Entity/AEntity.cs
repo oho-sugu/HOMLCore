@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Orthoverse.DOM.Component;
+
 using MoonSharp.Interpreter;
 
 namespace Orthoverse.DOM.Entity
@@ -14,8 +16,10 @@ namespace Orthoverse.DOM.Entity
             if(_attrAlias == null){
                 _attrAlias = new Dictionary<string, ComponentAttribute>();
                 attrAlias = _attrAlias;
+                addComponentMapping("material","color");
             }
             attrAlias = _attrAlias;
+            components.Add("material",ComponentTemplate.getComponent("material"));
         }
 
         public override void Construct(){

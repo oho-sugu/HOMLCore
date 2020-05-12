@@ -38,6 +38,10 @@ end
 <body>
 <a-scene>
 <a-box color='red' depth='2' height='4' width='0.5'>
+<a-entity geometry='primitive: cone; radiusBottom: 1; radiusTop: 0.1; height: 2;'></a-entity>
+<a-entity geometry='primitive: cylinder; height: 3; radius: 2;'></a-entity>
+<a-entity geometry='primitive: cylinder; openEnded: true;'></a-entity>
+<a-entity geometry='primitive: torus; radius: 2; radiusTubular: 0.2; arc: 180;'></a-entity>
 <a-box id='test' color='blue' depth='1' height='1' width='1' position='1 1 1' rotation='30 0 30' scale='1.5 1.5 1.5'>
 <a-sphere color='yellow' radius='0.5' position='2 1 1'></a-sphere></a-box>
 <a-box animation='property: object3D.position.z; to: 2; dur: 1000; loop: true' color='green' depth='0.5' height='0.5' width='0.5' position='-1 -1 -1'></a-box>

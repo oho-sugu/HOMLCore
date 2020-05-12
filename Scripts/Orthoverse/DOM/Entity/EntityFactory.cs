@@ -12,6 +12,9 @@ namespace Orthoverse.DOM.Entity
             EntityTemplate.addEntityTemplate("a-plane",typeof(APlane));
             EntityTemplate.addEntityTemplate("a-entity",typeof(AEntity));
             EntityTemplate.addEntityTemplate("a-scene",typeof(AScene));
+            EntityTemplate.addEntityTemplate("a-cone",typeof(ACone));
+            EntityTemplate.addEntityTemplate("a-cylinder",typeof(ACylinder));
+            EntityTemplate.addEntityTemplate("a-torus",typeof(ATorus));
         }
     }
 }
