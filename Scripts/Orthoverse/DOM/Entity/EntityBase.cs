@@ -11,12 +11,24 @@ using Orthoverse.DOM.Component;
 
 namespace Orthoverse.DOM.Entity
 {
+    public delegate void OnClick();
+    public delegate void OnOver();
+    public delegate void OnOut();
+    public delegate void OnStart(EntityBase e);
+
     [MoonSharpUserData]
     public class EntityBase : MonoBehaviour
     {
         protected Dictionary<string,ComponentAttribute> attrAlias;
         protected Dictionary<string,ComponentBase> components = new Dictionary<string, ComponentBase>();
         protected List<EntityBase> children = new List<EntityBase>();
+
+        public Document rootDocument;
+
+        public OnClick event_click;
+        public OnOver event_over;
+        public OnOut event_out;
+        public OnStart event_start;
 
         public void ParseAttributes(HtmlNode node){
             var attrs = node.GetAttributes();
@@ -73,12 +85,34 @@ namespace Orthoverse.DOM.Entity
         // Construct Entity
         // - Construct Unity Game Object
         // - Construct Component and link to GameObject
+        public void Construct(Document d){
+            this.rootDocument = d;
+            this.Construct();
+            return;
+        }
+
         public virtual void Construct(){
             return;
         }
 
+        
+
+        void Start(){
+            event_start?.Invoke(this);
+            event_start = null;
+        }
         public void addChild(EntityBase child){
             children.Add(child);
+        }
+
+        public void OnClickHandler(){
+            event_click?.Invoke();
+        }
+        public void OnOverHandler(){
+            event_over?.Invoke();
+        }
+        public void OnOutHandler(){
+            event_out?.Invoke();
         }
     }
 

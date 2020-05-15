@@ -46,7 +46,7 @@ namespace Orthoverse
                     entity = g.AddComponent(entityType) as EntityBase;
                     entity.initialize();
                     entity.ParseAttributes(node);
-                    entity.Construct();
+                    entity.Construct(doc);
 
                     var childs = parseRecurse(node.ChildNodes, doc);
                     foreach(EntityBase child in childs){

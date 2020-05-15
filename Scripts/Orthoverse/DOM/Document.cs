@@ -16,10 +16,13 @@ namespace Orthoverse.DOM
         // private script
         private EntityBase[] rootEntity;
         private string originalHoml;
+        public Uri uri;
         public string script;
         private Script _scriptContext;
 
         private Dictionary<string, EntityBase> EntityByID = new Dictionary<string, EntityBase>();
+
+        public DocumentManager dm;
 
         public void init(EntityBase[] roots, string original){
             gameObject.name = "Document";
@@ -67,6 +70,16 @@ namespace Orthoverse.DOM
             } catch (Exception e){
                 
             }
+        }
+
+        public void RunScript(string _scr){
+            _scriptContext.DoString(_scr);
+
+        }
+
+        public void Dispose(){
+            this.gameObject.SetActive(false);
+            this.Dispose();
         }
     }
 }

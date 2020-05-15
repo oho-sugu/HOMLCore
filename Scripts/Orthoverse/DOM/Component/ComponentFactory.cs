@@ -34,6 +34,10 @@ namespace Orthoverse.DOM.Component
             var animation = new Animation();
             animation.initialize();
             ComponentTemplate.addComponentTemplate(animation);
+
+            var link = new Link();
+            link.initialize();
+            ComponentTemplate.addComponentTemplate(link);
         }
     }
 }
