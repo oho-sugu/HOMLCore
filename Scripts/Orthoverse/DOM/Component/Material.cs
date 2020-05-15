@@ -30,7 +30,7 @@ namespace Orthoverse.DOM.Component
             switch(shadername){
                 case "flat":
                 case "standard":
-                    material = new UnityEngine.Material(Shader.Find("Standard"));
+                    material = new UnityEngine.Material(Shader.Find("Legacy Shaders/VertexLit"));
                     
                     //color
                     string colorCode = attrDic.TryGetValue("color", out colorCode) ? colorCode : "#FFFFFF";
