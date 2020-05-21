@@ -10,6 +10,9 @@ using Orthoverse.DOM.Entity;
 
 namespace Orthoverse.DOM
 {
+    public delegate void OnClick();
+    public delegate void OnOver();
+    public delegate void OnOut();
     [MoonSharpUserData]
     public class Document : MonoBehaviour
     {
@@ -19,6 +22,9 @@ namespace Orthoverse.DOM
         public Uri uri;
         public string script;
         private Script _scriptContext;
+        public OnClick event_click;
+        public OnOver event_over;
+        public OnOut event_out;
 
         private Dictionary<string, EntityBase> EntityByID = new Dictionary<string, EntityBase>();
 
@@ -80,6 +86,15 @@ namespace Orthoverse.DOM
         public void Dispose(){
             this.gameObject.SetActive(false);
             this.Dispose();
+        }
+        public void OnClickHandler(){
+            event_click?.Invoke();
+        }
+        public void OnOverHandler(){
+            event_over?.Invoke();
+        }
+        public void OnOutHandler(){
+            event_out?.Invoke();
         }
     }
 }

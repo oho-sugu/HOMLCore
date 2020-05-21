@@ -16,12 +16,33 @@ namespace Orthoverse
     public class DocumentManager : MonoBehaviour
     {
         private static Parser p = Parser.getInstance();
+
+        public string ElementLayerString;
+        public string DocumentLayerString;
         
+        public static int ElementLayer;
+        public static int DocumentLayer;
+
+        void Start(){
+            // No Layer is critical. Make 2 layers at preference and Set 2 layer names Element and Document.
+            ElementLayer = LayerMask.NameToLayer(ElementLayerString);
+            if(ElementLayerString == "" || ElementLayer == -1){
+                Debug.Log("Element Layer Not Found. " + ElementLayerString);
+                throw new Exception();
+            }
+            DocumentLayer = LayerMask.NameToLayer(DocumentLayerString);
+            if(DocumentLayerString == "" || DocumentLayer == -1){
+                Debug.Log("Document Layer Not Found. " + DocumentLayerString);
+                throw new Exception();
+            }
+        }
+
         private static List<Document> documents = new List<Document>();
 
         private Document open(Uri uri, string homl){
             Document d = p.parse(homl);
             d.uri = uri;
+            d.gameObject.layer = DocumentLayer;
             documents.Add(d);
             return d;
         }

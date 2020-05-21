@@ -42,6 +42,7 @@ namespace Orthoverse
                 System.Type entityType;
                 if((entityType = EntityTemplate.getEntity(node.Name)) != null){
                     GameObject g = new GameObject();
+                    g.layer = DocumentManager.ElementLayer;
                     EntityBase entity;
                     entity = g.AddComponent(entityType) as EntityBase;
                     entity.initialize();
