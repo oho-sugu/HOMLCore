@@ -62,9 +62,22 @@ namespace Orthoverse
                 } else {
                     if(node.Name == "#comment" || node.Name == "#text"){
                         //Debug.Log(node.OuterHtml);
-                    } if(node.Name == "script"){
+                    } else if(node.Name == "script"){
                         if(node.GetAttributeValue("type","") == "text/lua"){
                             doc.addScript(node.InnerText);
+                        }
+                    } else if(node.Name == "body") {
+                        var boundsAttr = node.GetAttributeValue("bounds","");
+                        if(boundsAttr != ""){
+                            Dictionary<string,string> attrdic = new Dictionary<string, string>();
+                            ParseUtil.parseAttribute(boundsAttr, ref attrdic);
+                            string center = attrdic.TryGetValue("center", out center) ? center : "";
+                            string size = attrdic.TryGetValue("size", out size) ? size : "";
+                            if(center != "" && size != ""){
+                                doc.bounds.center = ParseUtil.parseVec3(center);
+                                doc.bounds.size = ParseUtil.parseVec3(size);
+                                doc.boundsGiven = true;
+                            }
                         }
                     } else {
                         //Debug.Log(node.Name + " Not found. Do you register EntityFactory?");

@@ -37,11 +37,6 @@ namespace Orthoverse.DOM.Component
             target = attrDic.TryGetValue("target", out target) ? target : "_blank";
 
             href = href.Trim();
-            if(href.StartsWith("urlhttps(")){
-                href = "https://"+href.Replace("urlhttps(","").Replace(")","");
-            } else if(href.StartsWith("urlhttp(")){
-                href = "http://"+href.Replace("urlhttp(","").Replace(")","");
-            }
 
             e.event_click += linkAction;
             e.event_start += linkStart;

@@ -72,6 +72,12 @@ namespace Orthoverse
                 var nextstep = str.Trim().Split(separatorsColon);
                 if(nextstep.Length == 2){
                     attrDic.Add(nextstep[0].Trim(), nextstep[1].Trim());
+                } else if(nextstep.Length > 2){
+                    string val = nextstep[1].Trim();
+                    for(int i = 2;i < nextstep.Length;i++){
+                        val += ":"+nextstep[i].Trim();
+                    }
+                    attrDic.Add(nextstep[0].Trim(), val);
                 }
             }
         }
