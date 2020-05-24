@@ -107,8 +107,7 @@ namespace Orthoverse.DOM
         }
 
         public void Dispose(){
-            this.gameObject.SetActive(false);
-            this.Dispose();
+            Destroy(gameObject);
         }
         public void OnClickHandler(){
             event_click?.Invoke();
