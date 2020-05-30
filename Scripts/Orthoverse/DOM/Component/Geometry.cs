@@ -54,6 +54,15 @@ namespace Orthoverse.DOM.Component
                 case "torus":
                     torusGen(ref mesh, e.gameObject);
                     break;
+                case "circle":
+                    circleGen(ref mesh, e.gameObject);
+                    break;
+                case "ring":
+                    ringGen(ref mesh, e.gameObject);
+                    break;
+                case "triangle":
+                    triangleGen(ref mesh, e.gameObject);
+                    break;
                 default:
                     break;
             }
@@ -195,6 +204,65 @@ namespace Orthoverse.DOM.Component
             var bound = mesh.bounds;
             bc.center = bound.center;
             bc.size = bound.size;
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void circleGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            float radius = attrDic.TryGetValue("radius", out value) ? float.Parse(value) : 1f;
+            int segments = attrDic.TryGetValue("segments", out value) ? Mathf.Max(3,int.Parse(value)) : 32;
+            float thetaStart = attrDic.TryGetValue("thetaStart", out value) ? float.Parse(value) : 0f;
+            float thetaLength = attrDic.TryGetValue("thetaLength", out value) ? float.Parse(value) : 360f;
+
+            CircleGeometry.getVertices(ref mesh, radius,segments, thetaStart, thetaLength);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            bc.size = new Vector3(bound.size.x, bound.size.y, 0.05f);
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void ringGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            float innerRadius = attrDic.TryGetValue("radiusInner", out value) ? float.Parse(value) : 1f;
+            float outerRadius = attrDic.TryGetValue("radiusOuter", out value) ? float.Parse(value) : 1f;
+            int segmentsTheta = attrDic.TryGetValue("segmentsTheta", out value) ? Mathf.Max(3,int.Parse(value)) : 32;
+            int segmentsPhi = attrDic.TryGetValue("segmentsPhi", out value) ? Mathf.Max(1,int.Parse(value)) : 8;
+            float thetaStart = attrDic.TryGetValue("thetaStart", out value) ? float.Parse(value) : 0f;
+            float thetaLength = attrDic.TryGetValue("thetaLength", out value) ? float.Parse(value) : 360f;
+
+            RingGeometry.getVertices(ref mesh, innerRadius, outerRadius, segmentsTheta, segmentsPhi, thetaStart, thetaLength);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            bc.size = new Vector3(bound.size.x, bound.size.y, 0.05f);
+            bc.isTrigger = true;
+            bc.enabled = false;
+        }
+        private void triangleGen(ref UnityEngine.Mesh mesh, GameObject go){
+            string value;
+            Vector3 a = attrDic.TryGetValue("vertexA", out value) ? ParseUtil.parseVec3(value) : new Vector3(0f,0.5f,0f);
+            Vector3 b = attrDic.TryGetValue("vertexB", out value) ? ParseUtil.parseVec3(value) : new Vector3(-0.5f,-0.5f,0f);
+            Vector3 c = attrDic.TryGetValue("vertexC", out value) ? ParseUtil.parseVec3(value) : new Vector3(0.5f,-0.5f,0f);
+
+            TriangleGeometry.getVertices(ref mesh, a, b, c);
+
+            mesh.RecalculateBounds();
+
+            var bc = go.AddComponent<BoxCollider>();
+            var bound = mesh.bounds;
+            bc.center = bound.center;
+            if(Mathf.Abs(bound.size.z) < 0.01f){
+                bc.size = new Vector3(bound.size.x, bound.size.y, 0.05f);
+            } else {
+                bc.size = bound.size;
+            }
             bc.isTrigger = true;
             bc.enabled = false;
         }
