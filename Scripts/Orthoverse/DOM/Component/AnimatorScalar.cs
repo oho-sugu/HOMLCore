@@ -6,7 +6,7 @@ using UnityEngine;
 public delegate void ValueChange(float v);
 public delegate float ValueGet();
 
-public delegate float AnimFunc(float t, float f, float e, float d);
+public delegate float AnimFunc(float t);
 
 public class AnimatorScalar : MonoBehaviour
 {
@@ -32,19 +32,19 @@ public class AnimatorScalar : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
+        float t;
         if(time < delay){
             return;
         } else if(!loopInf) {
-            float t = (time - delay) % dur;
+            t = (time - delay) % dur;
             if(t < oldt){
                 loop = Mathf.Max(0,loop-1);
                 if(loop <= 0) return;
             }
-            vc(af(t,from,to,dur));
             oldt = t;
-        } else if(loopInf){
-            float t = (time - delay) % dur;
-            vc(af(t,from,to,dur));
+        } else {
+            t = (time - delay) % dur;
         }
+        vc(from + (to - from) * af(t/dur));
     }
 }
