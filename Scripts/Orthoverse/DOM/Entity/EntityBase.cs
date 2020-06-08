@@ -100,6 +100,10 @@ namespace Orthoverse.DOM.Entity
         void Start(){
             event_start?.Invoke(this);
             event_start = null;
+
+            foreach(ComponentBase c in components.Values){
+                c.start();
+            }
         }
         public void addChild(EntityBase child){
             children.Add(child);

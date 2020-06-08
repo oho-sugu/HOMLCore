@@ -38,6 +38,10 @@ namespace Orthoverse.DOM.Component
             var link = new Link();
             link.initialize();
             ComponentTemplate.addComponentTemplate(link);
+
+            var text = new Text();
+            text.initialize();
+            ComponentTemplate.addComponentTemplate(text);
         }
     }
 }
