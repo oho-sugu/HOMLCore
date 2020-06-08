@@ -36,6 +36,14 @@ namespace Orthoverse.DOM.Component
                     string colorCode = attrDic.TryGetValue("color", out colorCode) ? colorCode : "#FFFFFF";
                     material.color = ParseUtil.parseColor(colorCode);
 
+                    //texture
+                    string texid = attrDic.TryGetValue("src", out texid) ? texid : "";
+                    texid = texid.Replace("#","");
+
+                    if(texid !="" && parent.rootDocument.textures.ContainsKey(texid)){
+                        material.mainTexture = parent.rootDocument.textures[texid];
+                    }
+
                     break;
                 default:
                     break;

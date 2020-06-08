@@ -57,10 +57,6 @@ namespace Orthoverse.DOM.Entity
                     }
                 }
             }
-            foreach(var c in components.Values){
-                c.AddParent(this);
-                c.Construct(this);
-            }
         }
 
         public ComponentBase GetComponentBase(string name){
@@ -87,6 +83,10 @@ namespace Orthoverse.DOM.Entity
         // - Construct Component and link to GameObject
         public void Construct(Document d){
             this.rootDocument = d;
+            foreach(var c in components.Values){
+                c.AddParent(this);
+                c.Construct(this);
+            }
             this.Construct();
             return;
         }

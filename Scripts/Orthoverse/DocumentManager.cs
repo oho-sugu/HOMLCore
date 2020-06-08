@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 using System;
 
 using Orthoverse.DOM;
+using Cysharp.Threading.Tasks;
 
 namespace Orthoverse
 {
@@ -39,8 +40,8 @@ namespace Orthoverse
 
         private static List<Document> documents = new List<Document>();
 
-        private Document open(Uri uri, string homl){
-            Document d = p.parse(homl);
+        private async UniTask<Document> open(Uri uri, string homl){
+            Document d = await p.parse(homl);
             d.uri = uri;
             d.gameObject.layer = DocumentLayer;
             documents.Add(d);
@@ -48,15 +49,12 @@ namespace Orthoverse
         }
 
         public void open(Document d,Uri uri,OpenMode mode){
-            StartCoroutine(openDoc(d,uri,mode));
+            openDoc(d,uri,mode).Forget();
         }
 
-        IEnumerator openDoc(Document d, Uri uri, OpenMode mode){
-            var cr = DownloadHOML(uri);
-            yield return StartCoroutine(cr);
-
-            string data = (string)cr.Current;
-            Document newd = open(uri, data);
+        async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode){
+            string data =  await DownloadHOML(uri);
+            Document newd = await open(uri, data);
             newd.gameObject.transform.parent = this.transform;
             newd.dm = this;
 
@@ -81,17 +79,17 @@ namespace Orthoverse
             }
         }
 
-        IEnumerator DownloadHOML(Uri uri){
+        async UniTask<string> DownloadHOML(Uri uri){
             UnityWebRequest req = UnityWebRequest.Get(uri);
             req.downloadHandler = new DownloadHandlerBuffer();
-            yield return req.SendWebRequest();
+            await req.SendWebRequest();
 
             if(req.isNetworkError || req.isHttpError){
                 Debug.Log(req.error);
-                yield return null;
+                return null;
             } else {
                 string data = req.downloadHandler.text;
-                yield return data;
+                return data;
             }
         }
 

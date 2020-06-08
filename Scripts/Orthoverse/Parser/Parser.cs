@@ -8,6 +8,9 @@ using Orthoverse.DOM;
 using Orthoverse.DOM.Component;
 using Orthoverse.DOM.Entity;
 
+using Cysharp.Threading.Tasks;
+
+using UnityEngine.Networking;
 
 namespace Orthoverse
 {
@@ -31,13 +34,52 @@ namespace Orthoverse
             EntityFactory.init();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public Document parse(string homl){
+        async UniTask<Texture2D> downloadTexture(string uri){
+            var uwr = UnityWebRequestTexture.GetTexture(uri);
+            await uwr.SendWebRequest();
+
+            return DownloadHandlerTexture.GetContent(uwr);
+        }
+        //[MethodImpl(MethodImplOptions.Synchronized)]
+        public async UniTask<Document> parse(string homl){
             var htmldoc = new HtmlAgilityPack.HtmlDocument();
             htmldoc.LoadHtml(homl);
 
             var docGO = new GameObject();
             var doc = docGO.AddComponent<Document>() as Document;
+
+            var assets = htmldoc.DocumentNode.SelectNodes(@"//a-assets/*");
+            if(assets != null){
+                foreach(HtmlNode n in assets){
+                    switch(n.Name){
+                        case "img":
+                            string id = n.GetAttributeValue("id","");
+                            if(id != ""){
+                                if(!doc.textures.ContainsKey(id)){
+                                    string src = n.GetAttributeValue("src","");
+                                    if(src!=""){
+                                        var tex = await downloadTexture(src);
+                                        doc.textures.Add(id, tex);
+                                    }
+                                } else {
+                                    Debug.Log("Duplicate key for textures");
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            var scripts = htmldoc.DocumentNode.SelectNodes(@"//script");
+            if(scripts != null){
+                foreach(HtmlNode n in scripts){
+                    if(n.GetAttributeValue("type","") == "text/lua"){
+                        doc.addScript(n.InnerText);
+                    }
+                }
+            }
+
             doc.init(parseRecurse(htmldoc.DocumentNode.ChildNodes, doc),homl);
 
             _postInitDocument?.Invoke(doc);
@@ -71,10 +113,6 @@ namespace Orthoverse
                 } else {
                     if(node.Name == "#comment" || node.Name == "#text"){
                         //Debug.Log(node.OuterHtml);
-                    } else if(node.Name == "script"){
-                        if(node.GetAttributeValue("type","") == "text/lua"){
-                            doc.addScript(node.InnerText);
-                        }
                     } else if(node.Name == "body") {
                         var boundsAttr = node.GetAttributeValue("bounds","");
                         if(boundsAttr != ""){
