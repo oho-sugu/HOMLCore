@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Orthoverse
 {
@@ -80,6 +81,28 @@ namespace Orthoverse
                     attrDic.Add(nextstep[0].Trim(), val);
                 }
             }
+        }
+
+        public static Uri absoluteUri(Uri baseUri, string relUriStr){
+            try{
+                var uri = new Uri(baseUri, relUriStr);
+                return uri;
+            } catch(Exception e){
+                Debug.Log(relUriStr);
+                Debug.Log(e);
+            }
+            return null;
+        }
+
+        public static Uri absoluteUri(Uri baseUri, Uri relUri){
+            try{
+                var newuri = new Uri(baseUri, relUri);
+                return newuri;
+            } catch(Exception e){
+                Debug.Log(relUri);
+                Debug.Log(e);
+            }
+            return relUri;
         }
     }
 }

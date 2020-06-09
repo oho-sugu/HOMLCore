@@ -32,6 +32,7 @@ namespace Orthoverse.DOM
         private Dictionary<string, EntityBase> EntityByID = new Dictionary<string, EntityBase>();
 
         public Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+        public Dictionary<string, byte[]> assetItems = new Dictionary<string, byte[]>();
 
         public DocumentManager dm;
 

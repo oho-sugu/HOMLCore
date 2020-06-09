@@ -41,8 +41,7 @@ namespace Orthoverse
         private static List<Document> documents = new List<Document>();
 
         private async UniTask<Document> open(Uri uri, string homl){
-            Document d = await p.parse(homl);
-            d.uri = uri;
+            Document d = await p.parse(uri, homl);
             d.gameObject.layer = DocumentLayer;
             documents.Add(d);
             return d;
@@ -53,6 +52,11 @@ namespace Orthoverse
         }
 
         async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode){
+            // Convert absolute uri if old document given and uri is relative
+            if(d != null){
+                uri = ParseUtil.absoluteUri(d.uri, uri);
+            }
+            
             string data =  await DownloadHOML(uri);
             Document newd = await open(uri, data);
             newd.gameObject.transform.parent = this.transform;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using HtmlAgilityPack;
 using System.Runtime.CompilerServices;
+using System;
 
 using Orthoverse.DOM;
 using Orthoverse.DOM.Component;
@@ -34,35 +35,75 @@ namespace Orthoverse
             EntityFactory.init();
         }
 
-        async UniTask<Texture2D> downloadTexture(string uri){
+        async UniTask<Texture2D> downloadTexture(Uri uri){
             var uwr = UnityWebRequestTexture.GetTexture(uri);
             await uwr.SendWebRequest();
 
-            return DownloadHandlerTexture.GetContent(uwr);
+            if(uwr.isNetworkError || uwr.isHttpError){
+                Debug.Log(uwr.error);
+                return null;
+            } else {
+                return DownloadHandlerTexture.GetContent(uwr);
+            }
         }
+
+        async UniTask<byte[]> downloadData(Uri uri){
+            var uwr = UnityWebRequest.Get(uri);
+            await uwr.SendWebRequest();
+
+            if(uwr.isNetworkError || uwr.isHttpError){
+                Debug.Log(uwr.error);
+                return null;
+            } else {
+                return uwr.downloadHandler.data;
+            }
+        }
+    
         //[MethodImpl(MethodImplOptions.Synchronized)]
-        public async UniTask<Document> parse(string homl){
+        public async UniTask<Document> parse(Uri uri, string homl){
             var htmldoc = new HtmlAgilityPack.HtmlDocument();
             htmldoc.LoadHtml(homl);
 
             var docGO = new GameObject();
             var doc = docGO.AddComponent<Document>() as Document;
+            doc.uri = uri;
 
             var assets = htmldoc.DocumentNode.SelectNodes(@"//a-assets/*");
             if(assets != null){
                 foreach(HtmlNode n in assets){
+                    string id;
                     switch(n.Name){
                         case "img":
-                            string id = n.GetAttributeValue("id","");
+                            id = n.GetAttributeValue("id","");
                             if(id != ""){
                                 if(!doc.textures.ContainsKey(id)){
                                     string src = n.GetAttributeValue("src","");
                                     if(src!=""){
-                                        var tex = await downloadTexture(src);
-                                        doc.textures.Add(id, tex);
+                                        var srcuri = ParseUtil.absoluteUri(doc.uri, src);
+                                        if(srcuri != null) {
+                                            var tex = await downloadTexture(srcuri);
+                                            if(tex != null) { doc.textures.Add(id, tex); }
+                                        }
                                     }
                                 } else {
                                     Debug.Log("Duplicate key for textures");
+                                }
+                            }
+                            break;
+                        case "a-asset-item":
+                            id = n.GetAttributeValue("id","");
+                            if(id != ""){
+                                if(!doc.assetItems.ContainsKey(id)){
+                                    string src = n.GetAttributeValue("src","");
+                                    if(src!=""){
+                                        var srcuri = ParseUtil.absoluteUri(doc.uri, src);
+                                        if(srcuri != null) {
+                                            var data = await downloadData(srcuri);
+                                            if(data != null) { doc.assetItems.Add(id, data); }
+                                        }
+                                    }
+                                } else {
+                                    Debug.Log("Duplicate key for asset-item");
                                 }
                             }
                             break;
