@@ -22,6 +22,17 @@ namespace Orthoverse
             return retVec;
         }
 
+        public static Vector2 parseVec2(string text){
+            var vals = text.Trim().Split(separatorsSpacce);
+            
+            // TODO 0: zero 1: x 0 0 2: x x 0
+            // length not 3 then return default value
+            if(vals.Length != 2) return Vector2.zero;
+
+            var retVec = new Vector2(float.Parse(vals[0]),float.Parse(vals[1]));
+            return retVec;
+        }
+
         private static Dictionary<string, UnityEngine.Color> colorDic;
         private static UnityEngine.Color defaultColor = UnityEngine.Color.gray;
         public static UnityEngine.Color parseColor(string colorString){

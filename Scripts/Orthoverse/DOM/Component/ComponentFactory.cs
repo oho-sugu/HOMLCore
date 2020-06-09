@@ -42,6 +42,10 @@ namespace Orthoverse.DOM.Component
             var text = new Text();
             text.initialize();
             ComponentTemplate.addComponentTemplate(text);
+
+            var obj = new ObjModel();
+            obj.initialize();
+            ComponentTemplate.addComponentTemplate(obj);
         }
     }
 }
