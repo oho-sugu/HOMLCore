@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Orthoverse.DOM.Entity;
-
-using UniGLTF;
+using VRM;
 
 namespace Orthoverse.DOM.Component
 {
-    public class GltfModel : ComponentBase
+    public class VRMModel : ComponentBase
     {
-        private static string _name = "gltf-model";
+        private static string _name = "vrm-model";
 
         public override void initialize(){
             this.name = _name;
         }
 
         public override ComponentBase newComponent(){
-            var c = new GltfModel();
+            var c = new VRMModel();
             c.initialize();
             return c;
         }
@@ -31,8 +30,9 @@ namespace Orthoverse.DOM.Component
 
             if(e.rootDocument.assetItems.ContainsKey(objid.Replace("#",""))){
                 byte[] data = e.rootDocument.assetItems[objid.Replace("#","")];
-                var context = new ImporterContext();
+                var context = new VRMImporterContext();
                 context.ParseGlb(data);
+                var meta = context.ReadMeta(false);
                 context.Load();
                 var root = context.Root;
                 root.transform.SetParent(e.gameObject.transform, false);

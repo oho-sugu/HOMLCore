@@ -46,6 +46,14 @@ namespace Orthoverse.DOM.Component
             var obj = new ObjModel();
             obj.initialize();
             ComponentTemplate.addComponentTemplate(obj);
+
+            var gltf = new GltfModel();
+            gltf.initialize();
+            ComponentTemplate.addComponentTemplate(gltf);
+
+            var vrm = new VRMModel();
+            vrm.initialize();
+            ComponentTemplate.addComponentTemplate(vrm);
         }
     }
 }
