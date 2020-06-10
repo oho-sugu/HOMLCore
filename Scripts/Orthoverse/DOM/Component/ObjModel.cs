@@ -33,7 +33,6 @@ namespace Orthoverse.DOM.Component
             string objid = attrDic.TryGetValue("obj", out objid) ? objid : "";
             string mtlid = attrDic.TryGetValue("mtl", out mtlid) ? mtlid : "";
 
-            Debug.Log(objid);
             if(e.rootDocument.assetItems.ContainsKey(objid.Replace("#",""))){
                 byte[] data = e.rootDocument.assetItems[objid.Replace("#","")];
                 using(var strreader = new StreamReader(new MemoryStream(data))){
@@ -49,7 +48,6 @@ namespace Orthoverse.DOM.Component
                             // comment
                         } else if(line.StartsWith("v")){
                             var v = ParseUtil.parseVec3(line.Substring(2).Trim());
-                            Debug.Log(v);
                             vertices.Add(v);
                             iVert++;
                         } else if(line.StartsWith("vn")){
