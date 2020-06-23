@@ -30,18 +30,18 @@ namespace Orthoverse.DOM.Component
             switch(shadername){
                 case "flat":
                 case "standard":
-                    material = new UnityEngine.Material(Shader.Find("Legacy Shaders/VertexLit"));
+                    material = new UnityEngine.Material(Shader.Find("Universal Render Pipeline/Simple Lit"));
                     
                     //color
                     string colorCode = attrDic.TryGetValue("color", out colorCode) ? colorCode : "#FFFFFF";
-                    material.color = ParseUtil.parseColor(colorCode);
+                    material.SetColor("_BaseColor", ParseUtil.parseColor(colorCode));
 
                     //texture
                     string texid = attrDic.TryGetValue("src", out texid) ? texid : "";
                     texid = texid.Replace("#","");
 
                     if(texid !="" && parent.rootDocument.textures.ContainsKey(texid)){
-                        material.mainTexture = parent.rootDocument.textures[texid];
+                        material.SetTexture("_BaseMap", parent.rootDocument.textures[texid]);
                     }
 
                     break;
