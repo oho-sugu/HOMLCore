@@ -37,7 +37,13 @@ namespace Orthoverse
 
         async UniTask<Texture2D> downloadTexture(Uri uri){
             var uwr = UnityWebRequestTexture.GetTexture(uri);
-            await uwr.SendWebRequest();
+
+            try {
+                await uwr.SendWebRequest();
+            } catch(UnityWebRequestException e){
+                Debug.Log(e);
+                Debug.Log(e.ResponseCode);
+            }
 
             if(uwr.isNetworkError || uwr.isHttpError){
                 Debug.Log(uwr.error);
@@ -49,7 +55,13 @@ namespace Orthoverse
 
         async UniTask<byte[]> downloadData(Uri uri){
             var uwr = UnityWebRequest.Get(uri);
-            await uwr.SendWebRequest();
+
+            try {
+                await uwr.SendWebRequest();
+            } catch(UnityWebRequestException e){
+                Debug.Log(e);
+                Debug.Log(e.ResponseCode);
+            }
 
             if(uwr.isNetworkError || uwr.isHttpError){
                 Debug.Log(uwr.error);

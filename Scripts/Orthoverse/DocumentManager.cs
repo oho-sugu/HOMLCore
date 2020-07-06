@@ -86,7 +86,12 @@ namespace Orthoverse
         async UniTask<string> DownloadHOML(Uri uri){
             UnityWebRequest req = UnityWebRequest.Get(uri);
             req.downloadHandler = new DownloadHandlerBuffer();
-            await req.SendWebRequest();
+            try {
+                await req.SendWebRequest();
+            } catch(UnityWebRequestException e){
+                Debug.Log(e);
+                Debug.Log(e.ResponseCode);
+            }
 
             if(req.isNetworkError || req.isHttpError){
                 Debug.Log(req.error);
