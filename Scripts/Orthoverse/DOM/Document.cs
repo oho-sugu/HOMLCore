@@ -18,6 +18,7 @@ namespace Orthoverse.DOM
     {
         // private script
         private EntityBase[] rootEntity;
+        public string title;
         private string originalHoml;
         public Uri uri;
         public string script;
@@ -44,6 +45,18 @@ namespace Orthoverse.DOM
                 node.gameObject.transform.SetParent(this.gameObject.transform,false);
             }
             var bc = gameObject.AddComponent<BoxCollider>();
+            if(!boundsGiven){
+                bounds = new Bounds(this.transform.position,Vector3.zero);
+                recurseBounds(ref bounds, this.transform);
+            }
+            bc.center = bounds.center;
+            bc.size = bounds.size;
+            bc.isTrigger = true;
+            bc.enabled = true;
+        }
+
+        public void resetBoxCollider(){
+            var bc = gameObject.GetComponent<BoxCollider>();
             if(!boundsGiven){
                 bounds = new Bounds(this.transform.position,Vector3.zero);
                 recurseBounds(ref bounds, this.transform);
@@ -120,6 +133,10 @@ namespace Orthoverse.DOM
         }
         public void OnOutHandler(){
             event_out?.Invoke();
+        }
+
+        public void SetActive(bool b){
+            gameObject.SetActive(b);
         }
     }
 }

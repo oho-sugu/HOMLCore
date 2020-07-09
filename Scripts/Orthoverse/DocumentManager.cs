@@ -20,6 +20,9 @@ namespace Orthoverse
 
         public string ElementLayerString;
         public string DocumentLayerString;
+
+        public GameObject Cube404;
+        public GameObject CubeError;
         
         public static int ElementLayer;
         public static int DocumentLayer;
@@ -38,12 +41,11 @@ namespace Orthoverse
             }
         }
 
-        private static List<Document> documents = new List<Document>();
+        private static List<Container> containers = new List<Container>();
 
         private async UniTask<Document> open(Uri uri, string homl){
             Document d = await p.parse(uri, homl);
             d.gameObject.layer = DocumentLayer;
-            documents.Add(d);
             return d;
         }
 
@@ -51,47 +53,75 @@ namespace Orthoverse
             openDoc(d,uri,mode).Forget();
         }
 
+        private bool flag404 = false;
+        private bool flagError = false;
+
         async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode){
             // Convert absolute uri if old document given and uri is relative
             if(d != null){
                 uri = ParseUtil.absoluteUri(d.uri, uri);
             }
             
-            string data =  await DownloadHOML(uri);
+            string data = "";
+            try{
+                data =  await DownloadHOML(uri);
+            }catch(UnityWebRequestException e){
+                Debug.Log(e);
+                if(e.ResponseCode == 404){
+                    flag404 = true;
+                } else {
+                    flagError = true;
+                }
+            }
+
             Document newd = await open(uri, data);
-            newd.gameObject.transform.parent = this.transform;
             newd.dm = this;
+
+            if(flag404 || flagError){
+                if(flag404){
+                    Instantiate(Cube404, Vector3.zero, Quaternion.identity, newd.transform);
+                }
+                if(flagError){
+                    Instantiate(CubeError, Vector3.zero, Quaternion.identity, newd.transform);
+                }
+                newd.resetBoxCollider();
+            }
 
             switch(mode){
                 case OpenMode.blank:
-                    // TODO Placement Manager
-                    newd.transform.localPosition = ((d != null)? d.transform.localPosition : Vector3.zero) + UnityEngine.Random.onUnitSphere * 0.3f;
+                    var containerGameObject = new GameObject("Container");
+                    var container = containerGameObject.AddComponent<Container>();
+                    container.transform.parent = this.transform;
+                    containers.Add(container);
+                    container.Add(newd);
+                    container.transform.localPosition = 
+                        Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
+                    newd.transform.SetParent(container.transform,false);
                     break;
                 case OpenMode.self:
                     if(d != null){
-                        documents.Remove(d);
-                        newd.transform.localPosition = d.transform.localPosition;
-                        newd.transform.localRotation = d.transform.localRotation;
-                        newd.transform.localScale = d.transform.localScale;
-                        // TODO d dispose
-                        // TODO Remove SetActive
-                        d.Dispose();
+                        var _container = d.transform.parent.GetComponent<Container>();
+                        _container.Add(newd);
+                        newd.transform.SetParent(_container.transform, false);
                     } else {
-                        newd.transform.localPosition = ((d != null)? d.transform.localPosition : Vector3.zero) + UnityEngine.Random.onUnitSphere * 0.3f;
+                        var containerGameObject2 = new GameObject("Container");
+                        var container2 = containerGameObject2.AddComponent<Container>();
+                        container2.transform.parent = this.transform;
+                        containers.Add(container2);
+                        container2.Add(newd);
+                        container2.transform.localPosition = 
+                            Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
+                        newd.transform.SetParent(container2.transform,false);
                     }
                     break;
             }
         }
 
-        async UniTask<string> DownloadHOML(Uri uri){
+        async UniTask<string> DownloadHOML(Uri uri) {
             UnityWebRequest req = UnityWebRequest.Get(uri);
             req.downloadHandler = new DownloadHandlerBuffer();
-            try {
-                await req.SendWebRequest();
-            } catch(UnityWebRequestException e){
-                Debug.Log(e);
-                Debug.Log(e.ResponseCode);
-            }
+
+            await req.SendWebRequest();
 
             if(req.isNetworkError || req.isHttpError){
                 Debug.Log(req.error);
@@ -103,6 +133,7 @@ namespace Orthoverse
         }
 
         public void reload(Document target){
+            if(target == null) return;
             open(target,target.uri,OpenMode.self);
         }
 

@@ -166,6 +166,14 @@ namespace Orthoverse
                 } else {
                     if(node.Name == "#comment" || node.Name == "#text"){
                         //Debug.Log(node.OuterHtml);
+                    } else if(node.Name == "html") {
+                        // Do something for html tag
+                    } else if(node.Name == "head") {
+                        // Do something for head tag
+                    } else if(node.Name == "title") {
+                        if(node.InnerHtml != null || node.InnerHtml.Length > 0){
+                            doc.title = node.InnerHtml;
+                        }
                     } else if(node.Name == "body") {
                         var boundsAttr = node.GetAttributeValue("bounds","");
                         if(boundsAttr != ""){

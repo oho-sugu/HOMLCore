@@ -52,7 +52,7 @@ namespace Orthoverse.DOM.Component
                     mode = OpenMode.self;
                     break;
                 default:
-                    mode = OpenMode.blank;
+                    mode = OpenMode.self;
                     break;
             }
             Debug.Log(href);
