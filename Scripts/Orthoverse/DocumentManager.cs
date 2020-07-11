@@ -63,6 +63,8 @@ namespace Orthoverse
             }
             
             string data = "";
+            flag404 = false;
+            flagError = false;
             try{
                 data =  await DownloadHOML(uri);
             }catch(UnityWebRequestException e){
@@ -85,6 +87,8 @@ namespace Orthoverse
                     Instantiate(CubeError, Vector3.zero, Quaternion.identity, newd.transform);
                 }
                 newd.resetBoxCollider();
+                flag404 = false;
+                flagError = false;
             }
 
             switch(mode){
