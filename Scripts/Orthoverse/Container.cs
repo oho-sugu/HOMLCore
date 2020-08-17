@@ -56,14 +56,14 @@ namespace Orthoverse
             }
         }
 
-        public bool hasNext(){
+        private bool hasNext(){
             if(current != null){
                 return (current.Next != null);
             }
             return false;
         }
 
-        public bool hasPrev(){
+        private bool hasPrev(){
             if(current != null){
                 return (current.Previous != null);
             }

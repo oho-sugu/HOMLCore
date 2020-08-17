@@ -10,6 +10,9 @@ using Cysharp.Threading.Tasks;
 
 namespace Orthoverse
 {
+    public delegate void postInitDocument(Container container);
+    public delegate void postRenewDocument(Container container1);
+
     public enum OpenMode{
         blank,
         self
@@ -27,6 +30,19 @@ namespace Orthoverse
         public static int ElementLayer;
         public static int DocumentLayer;
 
+        private static List<Container> containers = new List<Container>();
+
+        private static Container currentContainer;
+        private postInitDocument _postInitDocument;
+
+        public void setPostInitDocumentDelegate(postInitDocument _p){
+            _postInitDocument += _p;
+        }
+        private postRenewDocument _postRenewDocument;
+        public void setPostRenewDocumentDelegate(postRenewDocument _p){
+            _postRenewDocument += _p;
+        }
+
         void Start(){
             // No Layer is critical. Make 2 layers at preference and Set 2 layer names Element and Document.
             ElementLayer = LayerMask.NameToLayer(ElementLayerString);
@@ -41,16 +57,15 @@ namespace Orthoverse
             }
         }
 
-        private static List<Container> containers = new List<Container>();
+        // Entry point of Document Open
+        public void open(Document d,Uri uri,OpenMode mode){
+            openDoc(d,uri,mode).Forget();
+        }
 
-        private async UniTask<Document> open(Uri uri, string homl){
+        private async UniTask<Document> parseDocument(Uri uri, string homl){
             Document d = await p.parse(uri, homl);
             d.gameObject.layer = DocumentLayer;
             return d;
-        }
-
-        public void open(Document d,Uri uri,OpenMode mode){
-            openDoc(d,uri,mode).Forget();
         }
 
         private bool flag404 = false;
@@ -76,7 +91,7 @@ namespace Orthoverse
                 }
             }
 
-            Document newd = await open(uri, data);
+            Document newd = await parseDocument(uri, data);
             newd.dm = this;
 
             if(flag404 || flagError){
@@ -101,12 +116,16 @@ namespace Orthoverse
                     container.transform.localPosition = 
                         Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
                     newd.transform.SetParent(container.transform,false);
+
+                    _postInitDocument?.Invoke(container);
+
                     break;
                 case OpenMode.self:
                     if(d != null){
                         var _container = d.transform.parent.GetComponent<Container>();
                         _container.Add(newd);
                         newd.transform.SetParent(_container.transform, false);
+                        _postRenewDocument(_container);
                     } else {
                         var containerGameObject2 = new GameObject("Container");
                         var container2 = containerGameObject2.AddComponent<Container>();
@@ -116,6 +135,8 @@ namespace Orthoverse
                         container2.transform.localPosition = 
                             Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
                         newd.transform.SetParent(container2.transform,false);
+
+                        _postInitDocument?.Invoke(container2);
                     }
                     break;
             }
@@ -136,9 +157,32 @@ namespace Orthoverse
             }
         }
 
-        public void reload(Document target){
-            if(target == null) return;
-            open(target,target.uri,OpenMode.self);
+
+        public void setCurretContainer(Container con){
+            if(containers.Contains(con)){
+                currentContainer = con;
+            }
+        }
+
+        public void reload(){
+            if(currentContainer!=null){
+                var target = currentContainer.GetCurrent();
+                open(target,target.uri,OpenMode.self);
+            }
+        }
+
+        public void next(){
+            if(currentContainer!=null){
+                currentContainer.next();
+                _postRenewDocument?.Invoke(currentContainer);
+            }
+        }
+
+        public void prev(){
+            if(currentContainer!=null){
+                currentContainer.prev();
+                _postRenewDocument?.Invoke(currentContainer);
+            }
         }
 
     }

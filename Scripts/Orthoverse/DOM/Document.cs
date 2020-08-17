@@ -37,6 +37,7 @@ namespace Orthoverse.DOM
 
         public DocumentManager dm;
 
+        [MoonSharpHidden]
         public void init(EntityBase[] roots, string original){
             gameObject.name = "Document";
             rootEntity = roots;
@@ -55,6 +56,7 @@ namespace Orthoverse.DOM
             bc.enabled = true;
         }
 
+        [MoonSharpHidden]
         public void resetBoxCollider(){
             var bc = gameObject.GetComponent<BoxCollider>();
             if(!boundsGiven){
@@ -67,6 +69,7 @@ namespace Orthoverse.DOM
             bc.enabled = true;
         }
 
+        [MoonSharpHidden]
         private void recurseBounds(ref Bounds bounds, Transform parent){
             int count = parent.childCount;
             for(int i= 0; i < count; i++){
@@ -78,10 +81,12 @@ namespace Orthoverse.DOM
             }
         }
 
+        [MoonSharpHidden]
         public void addScript(string str){
             script += str;
         }
 
+        [MoonSharpHidden]
         public void addIDList(string id, EntityBase entity){
             EntityByID.Add(id,entity);
         }
@@ -93,6 +98,7 @@ namespace Orthoverse.DOM
         }
 
         // Start is called before the first frame update
+        [MoonSharpHidden]
         void Start()
         {
             _scriptContext = new Script();
@@ -103,34 +109,42 @@ namespace Orthoverse.DOM
             try{
                 _scriptContext.Call(_scriptContext.Globals["start"]);
             } catch (Exception e){
-                
             }
         }
 
+        private bool hasUpdate = true;
         // Update is called once per frame
+        [MoonSharpHidden]
         void Update()
         {
-            try{
-                _scriptContext.Call(_scriptContext.Globals["update"]);
-            } catch (Exception e){
-                
+            if(hasUpdate){
+                try{
+                    _scriptContext.Call(_scriptContext.Globals["update"]);
+                } catch (Exception e){
+                    hasUpdate = false;
+                }
             }
         }
 
+        [MoonSharpHidden]
         public void RunScript(string _scr){
             _scriptContext.DoString(_scr);
 
         }
 
+        [MoonSharpHidden]
         public void Dispose(){
             Destroy(gameObject);
         }
+        [MoonSharpHidden]
         public void OnClickHandler(){
             event_click?.Invoke();
         }
+        [MoonSharpHidden]
         public void OnOverHandler(){
             event_over?.Invoke();
         }
+        [MoonSharpHidden]
         public void OnOutHandler(){
             event_out?.Invoke();
         }

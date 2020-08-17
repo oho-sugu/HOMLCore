@@ -15,18 +15,12 @@ using UnityEngine.Networking;
 
 namespace Orthoverse
 {
-    public delegate void postInitDocument(Document doc);
     public class Parser
     {
         private static Parser _instance = new Parser();
 
-        private postInitDocument _postInitDocument;
         public static Parser getInstance(){
             return _instance;
-        }
-
-        public void setPostInitDocumentDelegate(postInitDocument _p){
-            _postInitDocument += _p;
         }
 
         private Parser(){
@@ -135,8 +129,6 @@ namespace Orthoverse
 
             doc.init(parseRecurse(htmldoc.DocumentNode.ChildNodes, doc),homl);
 
-            _postInitDocument?.Invoke(doc);
-            
             return doc;
         }
 

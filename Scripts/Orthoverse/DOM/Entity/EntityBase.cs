@@ -47,10 +47,17 @@ namespace Orthoverse.DOM.Entity
                     if(components.ContainsKey(attr.Name)){
                         components[attr.Name].Parse(attr.Value);
                     } else {
-                        var c = ComponentTemplate.getComponent(attr.Name);
+                        string attrName;
+                        if(attr.Name.Contains("__")){
+                            int locUS = attr.Name.IndexOf("__");
+                            attrName = attr.Name.Substring(0,locUS);
+                        } else {
+                            attrName = attr.Name;
+                        }
+                        var c = ComponentTemplate.getComponent(attrName);
                         if(c != null){
                             c.Parse(attr.Value);
-                            components.Add(c.getName(), c);
+                            components.Add(attr.Name, c);
                         } else {
                             //Debug.Log(attr.Name + " Not found. Do you register Component Factory?");
                         }
