@@ -6,12 +6,15 @@ using UnityEngine.Networking;
 using System;
 
 using Orthoverse.DOM;
+using Orthoverse.DOM.Entity;
 using Cysharp.Threading.Tasks;
 
 namespace Orthoverse
 {
     public delegate void postInitDocument(Container container);
-    public delegate void postRenewDocument(Container container1);
+    public delegate void postRenewDocument(Container container);
+
+    public delegate void postLinkAction(EntityBase entity);
 
     public enum OpenMode{
         blank,
@@ -32,7 +35,7 @@ namespace Orthoverse
 
         private static List<Container> containers = new List<Container>();
 
-        private static Container currentContainer;
+//        private static Container currentContainer;
         private postInitDocument _postInitDocument;
 
         public void setPostInitDocumentDelegate(postInitDocument _p){
@@ -41,6 +44,10 @@ namespace Orthoverse
         private postRenewDocument _postRenewDocument;
         public void setPostRenewDocumentDelegate(postRenewDocument _p){
             _postRenewDocument += _p;
+        }
+        public postLinkAction _postLinkAction;
+        public void setPostLinkAction(postLinkAction _p){
+            _postLinkAction += _p;
         }
 
         void Start(){
@@ -158,32 +165,32 @@ namespace Orthoverse
         }
 
 
-        public void setCurretContainer(Container con){
-            if(containers.Contains(con)){
-                currentContainer = con;
-            }
-        }
+        // public void setCurretContainer(Container con){
+        //     if(containers.Contains(con)){
+        //         currentContainer = con;
+        //     }
+        // }
 
-        public void reload(){
-            if(currentContainer!=null){
-                var target = currentContainer.GetCurrent();
-                open(target,target.uri,OpenMode.self);
-            }
-        }
+        // public void reload(){
+        //     if(currentContainer!=null){
+        //         var target = currentContainer.GetCurrent();
+        //         open(target,target.uri,OpenMode.self);
+        //     }
+        // }
 
-        public void next(){
-            if(currentContainer!=null){
-                currentContainer.next();
-                _postRenewDocument?.Invoke(currentContainer);
-            }
-        }
+        // public void next(){
+        //     if(currentContainer!=null){
+        //         currentContainer.next();
+        //         _postRenewDocument?.Invoke(currentContainer);
+        //     }
+        // }
 
-        public void prev(){
-            if(currentContainer!=null){
-                currentContainer.prev();
-                _postRenewDocument?.Invoke(currentContainer);
-            }
-        }
+        // public void prev(){
+        //     if(currentContainer!=null){
+        //         currentContainer.prev();
+        //         _postRenewDocument?.Invoke(currentContainer);
+        //     }
+        // }
 
     }
 }

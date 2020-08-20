@@ -134,7 +134,8 @@ namespace Orthoverse.DOM
 
         [MoonSharpHidden]
         public void Dispose(){
-            Destroy(gameObject);
+            if(gameObject!=null)
+                Destroy(gameObject);
         }
         [MoonSharpHidden]
         public void OnClickHandler(){

@@ -62,6 +62,7 @@ namespace Orthoverse.DOM.Component
         public void linkStart(EntityBase e){
             var c = e.gameObject.GetComponent<Collider>();
             c.enabled = true;
+            this.parent.rootDocument.dm._postLinkAction?.Invoke(e);
         }
     }
 
