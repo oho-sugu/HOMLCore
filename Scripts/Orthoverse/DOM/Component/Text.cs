@@ -52,48 +52,48 @@ namespace Orthoverse.DOM.Component
             int align = 0;
             switch(stralign){
                 case "left":
-                    align |= (int)_HorizontalAlignmentOptions.Left;
+                    align |= (int)HorizontalAlignmentOptions.Left;
                     break;
                 case "right":
-                    align |= (int)_HorizontalAlignmentOptions.Right;
+                    align |= (int)HorizontalAlignmentOptions.Right;
                     break;
                 case "center":
-                    align |= (int)_HorizontalAlignmentOptions.Center;
+                    align |= (int)HorizontalAlignmentOptions.Center;
                     break;
                 case "justified":
-                    align |= (int)_HorizontalAlignmentOptions.Justified;
+                    align |= (int)HorizontalAlignmentOptions.Justified;
                     break;
                 case "flush":
-                    align |= (int)_HorizontalAlignmentOptions.Flush;
+                    align |= (int)HorizontalAlignmentOptions.Flush;
                     break;
                 case "geometry":
-                    align |= (int)_HorizontalAlignmentOptions.Geometry;
+                    align |= (int)HorizontalAlignmentOptions.Geometry;
                     break;
                 default:
-                    align |= (int)_HorizontalAlignmentOptions.Left;
+                    align |= (int)HorizontalAlignmentOptions.Left;
                     break;
             }
             switch(strvalign){
                 case "top":
-                    align |= (int)_VerticalAlignmentOptions.Top;
+                    align |= (int)VerticalAlignmentOptions.Top;
                     break;
                 case "middle":
-                    align |= (int)_VerticalAlignmentOptions.Middle;
+                    align |= (int)VerticalAlignmentOptions.Middle;
                     break;
                 case "bottom":
-                    align |= (int)_VerticalAlignmentOptions.Bottom;
+                    align |= (int)VerticalAlignmentOptions.Bottom;
                     break;
                 case "baseline":
-                    align |= (int)_VerticalAlignmentOptions.Baseline;
+                    align |= (int)VerticalAlignmentOptions.Baseline;
                     break;
                 case "midline":
-                    align |= (int)_VerticalAlignmentOptions.Geometry;
+                    align |= (int)VerticalAlignmentOptions.Geometry;
                     break;
                 case "capline":
-                    align |= (int)_VerticalAlignmentOptions.Capline;
+                    align |= (int)VerticalAlignmentOptions.Capline;
                     break;
                 default:
-                    align |= (int)_VerticalAlignmentOptions.Top;
+                    align |= (int)VerticalAlignmentOptions.Top;
                     break;
             }
             tmp.alignment = (TextAlignmentOptions)align;

@@ -56,7 +56,7 @@ namespace Orthoverse.DOM.Component
                     break;
             }
             Debug.Log(href);
-            this.parent.rootDocument.dm.open(this.parent.rootDocument,new System.Uri(href),mode);
+            this.parent.rootDocument.dm.open(this.parent.rootDocument,href,mode);
         }
 
         public void linkStart(EntityBase e){

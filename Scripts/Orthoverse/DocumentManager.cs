@@ -64,9 +64,42 @@ namespace Orthoverse
             }
         }
 
+        private Uri makeValidUrl(Document d, string strUri){
+            Uri url;
+            try {
+                if(d == null){
+                    url = new Uri(strUri);
+                } else {
+                    url = new Uri(d.uri, strUri);
+                }
+            } catch(UriFormatException e){
+                Debug.Log("Invalid URL : DocumentManager/makeValidUrl : " + strUri + " " + e);
+                throw new Exception("URL not Valid");
+            }
+            return url;
+        }
+
         // Entry point of Document Open
-        public void open(Document d,Uri uri,OpenMode mode){
-            openDoc(d,uri,mode).Forget();
+        public void open(Document d,string strUri,OpenMode mode){
+            Uri uri;
+            
+            try{
+                uri = makeValidUrl(d, strUri);
+            } catch (Exception e){
+                Debug.Log("URI Parse Error : " + e);
+                return;
+            }
+
+            // 拡張子のみを見て判断　HOMLパースか、Launch
+            if(uri.AbsolutePath.EndsWith(".homl")) {
+                openDoc(d,uri,mode).Forget();
+            } else {
+#if UNITY_WSA
+                UnityEngine.WSA.Launcher.LaunchUri(uri.AbsoluteUri, false);
+#else
+                Application.OpenURL(uri.AbsoluteUri);
+#endif
+            }
         }
 
         private async UniTask<Document> parseDocument(Uri uri, string homl){
@@ -79,11 +112,6 @@ namespace Orthoverse
         private bool flagError = false;
 
         async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode){
-            // Convert absolute uri if old document given and uri is relative
-            if(d != null){
-                uri = ParseUtil.absoluteUri(d.uri, uri);
-            }
-            
             string data = "";
             flag404 = false;
             flagError = false;
@@ -163,34 +191,5 @@ namespace Orthoverse
                 return data;
             }
         }
-
-
-        // public void setCurretContainer(Container con){
-        //     if(containers.Contains(con)){
-        //         currentContainer = con;
-        //     }
-        // }
-
-        // public void reload(){
-        //     if(currentContainer!=null){
-        //         var target = currentContainer.GetCurrent();
-        //         open(target,target.uri,OpenMode.self);
-        //     }
-        // }
-
-        // public void next(){
-        //     if(currentContainer!=null){
-        //         currentContainer.next();
-        //         _postRenewDocument?.Invoke(currentContainer);
-        //     }
-        // }
-
-        // public void prev(){
-        //     if(currentContainer!=null){
-        //         currentContainer.prev();
-        //         _postRenewDocument?.Invoke(currentContainer);
-        //     }
-        // }
-
     }
 }
