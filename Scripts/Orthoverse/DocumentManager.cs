@@ -11,7 +11,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Orthoverse
 {
-    public delegate void postInitDocument(Container container);
+    public delegate void postInitDocument(Container container, object param);
     public delegate void postRenewDocument(Container container);
 
     public delegate void postLinkAction(EntityBase entity);
@@ -80,7 +80,7 @@ namespace Orthoverse
         }
 
         // Entry point of Document Open
-        public void open(Document d,string strUri,OpenMode mode){
+        public void open(Document d,string strUri,OpenMode mode, object param){
             Uri uri;
             
             try{
@@ -90,16 +90,7 @@ namespace Orthoverse
                 return;
             }
 
-            // 拡張子のみを見て判断　HOMLパースか、Launch
-            if(uri.AbsolutePath.EndsWith(".homl")) {
-                openDoc(d,uri,mode).Forget();
-            } else {
-#if UNITY_WSA
-                UnityEngine.WSA.Launcher.LaunchUri(uri.AbsoluteUri, false);
-#else
-                Application.OpenURL(uri.AbsoluteUri);
-#endif
-            }
+            openDoc(d,uri,mode, param).Forget();
         }
 
         private async UniTask<Document> parseDocument(Uri uri, string homl){
@@ -111,7 +102,7 @@ namespace Orthoverse
         private bool flag404 = false;
         private bool flagError = false;
 
-        async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode){
+        async UniTaskVoid openDoc(Document d, Uri uri, OpenMode mode, object param){
             string data = "";
             flag404 = false;
             flagError = false;
@@ -152,7 +143,7 @@ namespace Orthoverse
                         Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
                     newd.transform.SetParent(container.transform,false);
 
-                    _postInitDocument?.Invoke(container);
+                    _postInitDocument?.Invoke(container, param);
 
                     break;
                 case OpenMode.self:
@@ -171,7 +162,7 @@ namespace Orthoverse
                             Placement.PlacementManager.GetNewPosition((d != null)? d.transform.parent.localPosition : Vector3.zero);
                         newd.transform.SetParent(container2.transform,false);
 
-                        _postInitDocument?.Invoke(container2);
+                        _postInitDocument?.Invoke(container2, param);
                     }
                     break;
             }
