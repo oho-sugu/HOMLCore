@@ -30,7 +30,7 @@ namespace Orthoverse.DOM.Component
             switch(shadername){
                 case "flat":
                 case "standard":
-                    material = new UnityEngine.Material(Shader.Find("Mixed Reality Toolkit/Standard"));
+                    material = new UnityEngine.Material(Shader.Find("Universal Render Pipeline/Lit"));
                     material.EnableKeyword("_DIRECTIONAL_LIGHT");
                     material.EnableKeyword("_HOVER_LIGHT");
                     material.EnableKeyword("_SPECULAR_HIGHLIGHTS");
@@ -40,14 +40,14 @@ namespace Orthoverse.DOM.Component
                     
                     //color
                     string colorCode = attrDic.TryGetValue("color", out colorCode) ? colorCode : "#FFFFFF";
-                    material.SetColor("_Color", ParseUtil.parseColor(colorCode));
+                    material.SetColor("_BaseColor", ParseUtil.parseColor(colorCode));
 
                     //texture
                     string texid = attrDic.TryGetValue("src", out texid) ? texid : "";
                     texid = texid.Replace("#","");
 
                     if(texid !="" && parent.rootDocument.textures.ContainsKey(texid)){
-                        material.SetTexture("_MainTex", parent.rootDocument.textures[texid]);
+                        material.SetTexture("_BaseMap", parent.rootDocument.textures[texid]);
                     }
 
                     break;

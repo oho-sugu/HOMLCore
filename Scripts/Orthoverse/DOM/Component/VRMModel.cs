@@ -4,12 +4,15 @@ using UnityEngine;
 
 using Orthoverse.DOM.Entity;
 using VRM;
+using UniGLTF;
+using VRMShaders;
 
 namespace Orthoverse.DOM.Component
 {
     public class VRMModel : ComponentBase
     {
         private static string _name = "vrm-model";
+        private RuntimeGltfInstance instance;
 
         public override void initialize(){
             this.name = _name;
@@ -27,17 +30,18 @@ namespace Orthoverse.DOM.Component
 
         public override void Construct(EntityBase e){
             string objid = attrDic.TryGetValue("obj", out objid) ? objid : "";
-
             if(e.rootDocument.assetItems.ContainsKey(objid.Replace("#",""))){
                 byte[] data = e.rootDocument.assetItems[objid.Replace("#","")];
-                var context = new VRMImporterContext();
-                context.ParseGlb(data);
-                var meta = context.ReadMeta(false);
-                context.Load();
-                var root = context.Root;
-                root.transform.SetParent(e.gameObject.transform, false);
-                context.ShowMeshes();
+
+                Load(e, data);
             }
+        }
+
+        private async void Load(EntityBase e, byte[] data)
+        {
+            this.instance = await VrmUtility.LoadBytesAsync("", data, new RuntimeOnlyAwaitCaller());
+            this.instance.transform.SetParent(e.gameObject.transform, false);
+            this.instance.ShowMeshes();
         }
     }
 }

@@ -1,11 +1,13 @@
 {
     "name": "HomlCore",
+    "rootNamespace": "",
     "references": [
         "MoonSharp",
         "Unity.TextMeshPro",
         "UniTask",
         "VRM",
-        "UniGLTF"
+        "UniGLTF",
+        "VRMShaders.GLTF.IO.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

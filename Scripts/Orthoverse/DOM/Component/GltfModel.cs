@@ -31,12 +31,12 @@ namespace Orthoverse.DOM.Component
 
             if(e.rootDocument.assetItems.ContainsKey(objid.Replace("#",""))){
                 byte[] data = e.rootDocument.assetItems[objid.Replace("#","")];
-                var context = new ImporterContext();
-                context.ParseGlb(data);
-                context.Load();
-                var root = context.Root;
-                root.transform.SetParent(e.gameObject.transform, false);
-                context.ShowMeshes();
+                using (var loader = new ImporterContext(new GlbBinaryParser(data, "LOAD_NAME").Parse()))
+                {
+                    var instance = loader.Load();
+                    instance.transform.SetParent(e.gameObject.transform, false);
+                    instance.ShowMeshes();
+                }
             }
         }
     }
